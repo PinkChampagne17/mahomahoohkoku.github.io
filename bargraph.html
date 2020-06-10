@@ -1,0 +1,72 @@
+<head>
+    <meta charset="utf-8">
+    <title>条形图</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/echarts/4.8.0/echarts.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.19.2/axios.min.js"></script>
+    <script src="./js/getquerystr.js"></script>
+</head>
+
+<body>
+    <div id="main" style="width: 100vh; height:100vh;"></div>
+
+    <script type="text/javascript">
+
+        const text = getQuery('name')
+        const date = getQuery('date')
+
+        var myChart = echarts.init(document.getElementById('main'));
+
+        option = {
+            title: {
+                text,
+                subtext: date
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+            legend: {
+                data: ['总分数', '等级']
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'value',
+                boundaryGap: [0, 0.01]
+            },
+            yAxis: {
+                type: 'category',
+                data: []
+            },
+            series: [
+                {
+                    name: '总分数',
+                    type: 'bar',
+                    data: []
+                },
+                {
+                    name: '等级',
+                    type: 'bar',
+                    data: []
+                }
+            ]
+        };
+
+        axios.get(`./data/${date}.json`)
+            .then(res => {
+                option.yAxis.data = res.data.members.map(m => m.name).reverse()
+                option.series[0].data = res.data.members.map(m => m.score).reverse()
+                option.series[1].data = res.data.members.map(m => m.level).reverse()
+
+                // 使用刚指定的配置项和数据显示图表。
+                myChart.setOption(option);
+            })
+            .catch(e => document.write('加载数据失败，错误信息 ' + e))
+    </script>
+</body>

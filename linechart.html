@@ -1,0 +1,84 @@
+<head>
+    <meta charset="utf-8">
+    <title>条形图</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/echarts/4.8.0/echarts.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.19.2/axios.min.js"></script>
+    <script src="./js/getquerystr.js"></script>
+</head>
+
+<body>
+    <div id="main" style="width: 100vh; height:100vh;"></div>
+
+    <script type="text/javascript">
+
+        const text = `${getQuery('name')}折线图`
+
+        var myChart = echarts.init(document.getElementById('main'));
+
+        option = {
+            title: {
+                text
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    label: {
+                        backgroundColor: '#6a7985'
+                    }
+                }
+            },
+            legend: {
+                data: ['排名']
+            },
+            toolbox: {
+                feature: {
+                    saveAsImage: {}
+                }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: []
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value'
+                }
+            ],
+            series: [
+                {
+                    name: '排名',
+                    type: 'line',
+                    stack: '总量',
+                    areaStyle: {},
+                    data: []
+                }
+            ]
+        };
+
+        axios.get(`./data/config.json`)
+            .then(res => {
+                res.data.list.reverse().forEach(date => {
+                    option.xAxis[0].data.push(date)
+                    axios.get(`./data/${date}.json`)
+                        .then(res => {
+                            console.log(res)
+                            option.series[0].data.push(res.data.ranking)
+                            // 使用刚指定的配置项和数据显示图表。
+                            myChart.setOption(option);
+                        })
+                        .catch(e => document.write('加载数据失败，错误信息 ' + e))
+                })
+            })
+            .catch(e => document.write('加载数据失败，错误信息 ' + e))
+    </script>
+</body>

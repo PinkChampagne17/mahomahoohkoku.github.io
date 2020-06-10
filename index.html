@@ -1,0 +1,191 @@
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <title></title>
+    <style>
+        body {
+            background: url('./favicon.png');
+        }
+        #app {
+            padding: 20px;
+        }
+        h3 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        p {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <v-app id="inspire">
+            <v-card style="padding: 20px;">
+                <h3>{{ clanName }} 会战记录</h3>
+                <div style="margin-bottom: 10px;">
+                    <v-menu bottom offset-y :disabled="isLoading">
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-btn
+                            color="primary"
+                            dark
+                            v-bind="attrs"
+                            v-on="on"
+                            >
+                            展示类型
+                            </v-btn>
+                        </template>
+                        <v-list>
+                            <v-list-item
+                                v-for="(item, index) in ['条形图', '饼图', '排名趋势']"
+                                :key="index"
+                                @click="type = item"
+                            >
+                            <v-list-item-title>{{ item }}</v-list-item-title>
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
+
+                    <v-menu bottom offset-y :disabled="isLoading">
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-btn
+                            color="primary"
+                            dark
+                            v-bind="attrs"
+                            v-on="on"
+                            >
+                            选择会战日期
+                            </v-btn>
+                        </template>
+                        <v-list>
+                            <v-list-item
+                                v-for="(item, index) in list"
+                                :key="index"
+                                @click="date = item"
+                            >
+                            <v-list-item-title>{{ item }}</v-list-item-title>
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
+                </div>
+                <v-text-field
+                    v-model="search"
+                    append-icon="mdi-magnify"
+                    label="搜索"
+                    single-line
+                    hide-details
+                    solo
+                    ></v-text-field>
+                <v-data-table
+                    :loading-text="loadingText"
+                    :loading="members.length == 0 || isLoading"
+                    :locale="`zh-cn`"
+                    :headers="headers"
+                    :items="members"
+                    :search="search"
+                    :disable-pagination="true"
+                    :hide-default-footer="true"
+                >
+                    <template v-slot:item.no="{ item }">
+                        <span>{{ count() }}</span>
+                    </template>
+                </v-data-table>
+                <p>Made by GitHub@PinkuSyanpan</p>
+            </v-card>
+        </v-app>
+    </div>
+</body>
+
+<script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/0.19.2/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
+<script>
+
+    var count = 1;
+
+    var app = new Vue({
+        el: '#app',
+        vuetify: new Vuetify(),
+        data () {
+            return {
+                headers: [
+                    { text: '序号', align: 'center', sortable: false, value: 'no' },
+                    { text: '昵称', align: 'center', sortable: false, value: 'name' },
+                    { text: '等级', value: 'level' },
+                    { text: '总分数', value: 'score' },
+                    { text: '平均每天分数', value: 'avgScore', sortable: false },
+                    { text: '分数占比', value: 'percent' },
+                ],
+                loadingText: '加载中...',
+                isLoading: false,
+                search: '',
+                members: [],
+                list: [],
+                date: '',
+                type: '',
+                clanName: '',
+            }
+        },
+        mounted: function () {
+            axios.get('./data/config.json')
+                 .then(res => {
+                    this.list = res.data.list
+                    this.clanName = res.data.clanName
+                    document.title = `${this.clanName} 会战记录`
+                 })
+                 .catch(e => this.throwsException(e))
+        },
+        watch: {
+            date: function (val, oldVal) {
+                this.useData(val)
+            },
+            list: function (val, oldVal) {
+                this.date = val[0]
+            },
+            type: function (val, oldVal) {
+                let url = `./linechart.html?name=${this.clanName}`
+                if (val == '饼图')  url = `./piechart.html?date=${this.date}`
+                if (val == '条形图')url = `./bargraph.html?date=${this.date}&name=${this.clanName}`
+                window.open(url, '_blank')
+            },
+        },
+        methods: {
+            count: function() {
+                let result = count;
+                count++;
+                if (count > this.members.length) {
+                    count = 1;
+                }
+                return result;
+            },
+            useData: function (date) {
+                this.isLoading = true
+                axios.get(`./data/${date}.json`)
+                     .then(res => {
+                        let sumScore = 0
+                        res.data.members.forEach(({ score }) => sumScore += score)
+                        app.members = res.data.members.map( ({ name, level, score }) => {
+                            return {
+                                name,
+                                level,
+                                score,
+                                avgScore: parseInt(score / res.data.days),
+                                percent: (score / sumScore * 100).toFixed(2) + '%'
+                            }
+                        })
+                        this.isLoading = false
+                     })
+                     .catch(e => this.throwsException(e))
+            },
+            throwsException: function (e) {
+                this.isLoading = true
+                this.loadingText = '获取数据失败或程序出现异常。\n错误信息：' + e
+            }
+        }
+    })
+
+    document.getElementsByClassName('v-application--wrap')[0].style.minHeight = "auto";
+</script>
