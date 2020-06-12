@@ -1,61 +1,53 @@
 <head>
     <title></title>
-    <style>
-        body {
-            background: url("https://priconne-redive.jp/ele-wp/wp-content/themes/redive/images/shared/loading/bg-loading.gif") repeat center top;
-        }
-    </style>
+    <script src="https://cdn.bootcdn.net/ajax/libs/echarts/4.8.0/echarts.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.19.2/axios.min.js"></script>
+    <script src="./js/getquerystr.js"></script>
 </head>
 
 <body>
-    <div id="app" style="width: 100%; height: 100%; overflow: hidden; position: relative;"><canvas width="741"
-            height="706" data-layer-id="default"
-            style="position: absolute; width: 741px; height: 706px; top: 0px; left: 0px; cursor: default;"></canvas><object
-            style="display: block;visibility:hidden; position: absolute; top: 0; left: 0; height: 100%; width: 100%; overflow: hidden;opacity: 0; pointer-events: none; z-index: -1;"
-            type="text/html" data="about:blank"></object></div>
-
-    <script src="https://lib.baomitu.com/spritejs/2.29.4/spritejs.min.js"></script>
-    <script src="https://unpkg.com/@qcharts/core@0.2/dist/index.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.19.2/axios.min.js"></script>
-    <script src="./js/getquerystr.js"></script>
-    <script>
-
-        const date = getQuery('date')
-
-        axios.get(`./data/${date}.json`)
-            .then(res => {
-                useQcharts(res.data.members.map(({ name, score }) => ({ name, score })))
-            })
-            .catch(e => document.write('加载数据失败，错误信息 ' + e))
-
-        function useQcharts(data) {
-            const { Chart, Pie, Legend, Tooltip } = qcharts
-
-            const chart = new Chart({
-                container: '#app'
-            })
-
-            chart.source(data, {
-                row: 'name',
-                value: 'score'
-            })
-
-            const pie = new Pie({ radius: 0.7, pos: [0, 0], size: ['80%', '100%'] })
-            pie.style('sector', { lineWidth: 1, strokeColor: '#fff' })
-            pie.style('guideline', true)
-            pie.style('guideText', true)
-
-            const legend = new Legend({ orient: 'vertical', align: ['right', 'center'] })
-            legend.style('icon', (attrs, d, i) => ({
-                marginTop: i > 0 ? 10 : 0
-            }))
-            legend.style('text', (attrs, d, i) => ({
-                marginTop: i > 0 ? 10 : 0
-            }))
-
-            chart.add([pie, legend])
-            chart.render()
-        }
-
-    </script>
+    <div id="main" style="width: 100vh; height:100vh;"></div>
 </body>
+
+<script>
+    const date = getQuery('date')
+    const name = getQuery('name')
+
+    var myChart = echarts.init(document.getElementById('main'));
+
+    option = {
+        title: {
+            text: name,
+            subtext: date,
+            left: 'center'
+        },
+        tooltip: {
+            trigger: 'item',
+            formatter: '{a} <br/>{b} : {c} ({d}%)'
+        },
+        series: [
+            {
+                name: '总分数',
+                type: 'pie',
+                radius: '55%',
+                center: ['50%', '60%'],
+                data: [],
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }
+        ]
+    };
+
+    axios.get(`./data/${date}.json`)
+        .then(res => {
+            option.series[0].data = res.data.members.map( ({ name, score }) => ({ name, value: score }) )
+
+            myChart.setOption(option);
+        })
+        .catch(e => document.write('加载数据失败，错误信息 ' + e))
+</script>

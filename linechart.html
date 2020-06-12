@@ -11,13 +11,13 @@
 
     <script type="text/javascript">
 
-        const text = getQuery('name')
+        const title = getQuery('name')
 
         var myChart = echarts.init(document.getElementById('main'));
 
         option = {
             title: {
-                text
+                text: title
             },
             tooltip: {
                 trigger: 'axis',
@@ -31,26 +31,15 @@
             legend: {
                 data: ['排名']
             },
-            toolbox: {
-                feature: {
-                    saveAsImage: {}
-                }
-            },
-            grid: {
-                left: '3%',
-                right: '4%',
-                bottom: '3%',
-                containLabel: true
-            },
             xAxis: [
                 {
                     type: 'category',
-                    boundaryGap: false,
                     data: []
                 }
             ],
             yAxis: [
                 {
+                    inverse: true,
                     type: 'value'
                 }
             ],
@@ -59,26 +48,25 @@
                     name: '排名',
                     type: 'line',
                     stack: '总量',
-                    areaStyle: {},
+                    smooth: true,
                     data: []
                 }
             ]
         };
 
         axios.get(`./data/config.json`)
-            .then(res => {
+             .then(res => {
                 res.data.list.reverse().forEach(date => {
                     option.xAxis[0].data.push(date)
                     axios.get(`./data/${date}.json`)
-                        .then(res => {
-                            console.log(res)
+                         .then(res => {
                             option.series[0].data.push(res.data.ranking)
-                            // 使用刚指定的配置项和数据显示图表。
+                            
                             myChart.setOption(option);
-                        })
-                        .catch(e => document.write('加载数据失败，错误信息 ' + e))
+                         })
+                         .catch(e => document.write('加载数据失败，错误信息 ' + e))
                 })
-            })
-            .catch(e => document.write('加载数据失败，错误信息 ' + e))
+             })
+             .catch(e => document.write('加载数据失败，错误信息 ' + e))
     </script>
 </body>

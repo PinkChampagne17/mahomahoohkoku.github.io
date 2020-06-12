@@ -27,7 +27,7 @@ var app = new Vue({
         this.myGet('./data/config.json', res => {
             this.list = res.data.list
             this.clanName = res.data.clanName
-            document.title = `${this.clanName} 会战记录`
+            document.title = `${this.clanName} ${this.date} 会战记录`
         })
     },
     watch: {
@@ -38,10 +38,13 @@ var app = new Vue({
             this.useData(val)
         },
         type: function (val, oldVal) {
-            let url = `./linechart.html?name=${this.clanName}`
-            if (val == '饼图')  url = `./piechart.html?date=${this.date}`
-            if (val == '条形图')url = `./bargraph.html?date=${this.date}&name=${this.clanName}`
-            window.open(url, '_blank')
+            let url = `./linechart.html`
+            let query = `?date=${this.date}&name=${this.clanName}`
+            
+            if (val == '饼图')  url = `./piechart.html`
+            if (val == '条形图')url = `./bargraph.html`
+            
+            window.open(url + query, '_blank')
         },
     },
     methods: {
@@ -61,15 +64,13 @@ var app = new Vue({
                     sumScore += score
                 })
 
-                app.members = res.data.members.map( ({ name, level, score }) => {
-                    return {
-                        name,
-                        level,
-                        score,
-                        avgScore: parseInt(score / res.data.days),
-                        percent: (score / sumScore * 100).toFixed(2) + '%'
-                    }
-                })
+                app.members = res.data.members.map( ({ name, level, score }) => ({
+                    name,
+                    level,
+                    score,
+                    avgScore: parseInt(score / res.data.days),
+                    percent: (score / sumScore * 100).toFixed(2) + '%'
+                }))
             })
         },
         myGet: function (url, callbackfn) {
@@ -83,7 +84,7 @@ var app = new Vue({
                  .catch(function (e) { 
                     this.isLoading = true
                     this.loadingText = '获取数据失败或程序出现异常。\n错误信息：' + e
-                })
+                 })
         }
     }
 })

@@ -60,11 +60,12 @@
 
         axios.get(`./data/${date}.json`)
             .then(res => {
-                option.yAxis.data = res.data.members.map(m => m.name).reverse()
-                option.series[0].data = res.data.members.map(m => m.score).reverse()
-                option.series[1].data = res.data.members.map(m => m.level).reverse()
+                let members = res.data.members.sort((a, b) => a.score - b.score)
 
-                // 使用刚指定的配置项和数据显示图表。
+                option.yAxis.data = members.map(m => m.name)
+                option.series[0].data = members.map(m => m.score)
+                option.series[1].data = members.map(m => m.level)
+
                 myChart.setOption(option);
             })
             .catch(e => document.write('加载数据失败，错误信息 ' + e))

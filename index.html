@@ -17,6 +17,7 @@
         }
         p {
             text-align: center;
+            color: #616161;
         }
     </style>
 </head>
@@ -25,15 +26,15 @@
     <div id="app">
         <v-app id="inspire">
             <v-card style="padding: 20px;">
-                <h3>{{ clanName }} {{ date }} 会战记录</h3>
+                <h3>{{ clanName }} 会战记录</h3>
                 <div style="margin-bottom: 10px;">
                     <v-menu bottom offset-y :disabled="isLoading">
                         <template v-slot:activator="{ on, attrs }">
                             <v-btn
-                            color="primary"
-                            dark
-                            v-bind="attrs"
-                            v-on="on"
+                                color="primary"
+                                dark
+                                v-bind="attrs"
+                                v-on="on"
                             >
                             展示类型
                             </v-btn>
@@ -52,10 +53,10 @@
                     <v-menu bottom offset-y :disabled="isLoading">
                         <template v-slot:activator="{ on, attrs }">
                             <v-btn
-                            color="primary"
-                            dark
-                            v-bind="attrs"
-                            v-on="on"
+                                color="primary"
+                                dark
+                                v-bind="attrs"
+                                v-on="on"
                             >
                             选择会战日期
                             </v-btn>
@@ -71,6 +72,7 @@
                         </v-list>
                     </v-menu>
                 </div>
+
                 <v-text-field
                     v-model="search"
                     append-icon="mdi-magnify"
@@ -79,6 +81,7 @@
                     hide-details
                     solo
                     ></v-text-field>
+
                 <v-data-table
                     :loading-text="loadingText"
                     :loading="members.length == 0 || isLoading"
@@ -93,15 +96,21 @@
                         <span>{{ count() }}</span>
                     </template>
                 </v-data-table>
-                <p>Made by GitHub@PinkuSyanpan</p>
+                
+                <br>
+                <p>
+                    Made by GitHub@PinkChampagne17
+                    <br>
+                    Powered by Vue.js & Vuetify on GitHub Pages
+                </p>
             </v-card>
         </v-app>
     </div>
 </body>
 
 <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js"></script>
-<script src="https://cdn.bootcdn.net/ajax/libs/axios/0.19.2/axios.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/0.19.2/axios.min.js"></script>
 <script src="./js/index-controller.js"></script>
 <script>
     document.getElementsByClassName('v-application--wrap')[0].style.minHeight = "auto";
