@@ -2,7 +2,7 @@
     <title></title>
     <script src="https://cdn.bootcdn.net/ajax/libs/echarts/4.8.0/echarts.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.19.2/axios.min.js"></script>
-    <script src="./js/getquerystr.js"></script>
+    <script src="../js/getquerystr.js"></script>
 </head>
 
 <body>
@@ -43,7 +43,7 @@
         ]
     };
 
-    axios.get(`./data/${date}.json`)
+    axios.get(`../data/${date}.json`)
         .then(res => {
             option.series[0].data = res.data.members.map( ({ name, score }) => ({ name, value: score }) )
 

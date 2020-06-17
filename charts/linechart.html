@@ -3,7 +3,7 @@
     <title>条形图</title>
     <script src="https://cdn.bootcdn.net/ajax/libs/echarts/4.8.0/echarts.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.19.2/axios.min.js"></script>
-    <script src="./js/getquerystr.js"></script>
+    <script src="../js/getquerystr.js"></script>
 </head>
 
 <body>
@@ -54,19 +54,23 @@
             ]
         };
 
-        axios.get(`./data/config.json`)
+        axios.get(`../config.json`)
              .then(res => {
-                res.data.list.reverse().forEach(date => {
+                res.data.dateList.reverse().forEach(date => {
                     option.xAxis[0].data.push(date)
-                    axios.get(`./data/${date}.json`)
+                    axios.get(`../data/${date}.json`)
                          .then(res => {
                             option.series[0].data.push(res.data.ranking)
                             
                             myChart.setOption(option);
                          })
-                         .catch(e => document.write('加载数据失败，错误信息 ' + e))
+                         .catch(e => dspException(e))
                 })
              })
-             .catch(e => document.write('加载数据失败，错误信息 ' + e))
+             .catch(e => dspException(e))
+        
+        function dspException (e) {
+            document.write('加载数据失败，错误信息 ' + e)
+        }
     </script>
 </body>

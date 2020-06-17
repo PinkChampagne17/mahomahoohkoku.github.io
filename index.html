@@ -6,7 +6,7 @@
     <title></title>
     <style>
         body {
-            background: url("https://priconne-redive.jp/ele-wp/wp-content/themes/redive/images/shared/loading/bg-loading.gif") repeat center top;
+            background: url("./img/bg.gif") repeat center top;
         }
         #app {
             padding: 20px;
@@ -19,12 +19,15 @@
             text-align: center;
             color: #616161;
         }
+        v-app {
+            display: none;
+        }
     </style>
 </head>
 
 <body>
     <div id="app">
-        <v-app id="inspire">
+        <v-app id="inspire" v-show="true">
             <v-card style="padding: 20px;">
                 <h3>{{ clanName }} 会战记录</h3>
                 <div style="margin-bottom: 10px;">
@@ -41,11 +44,11 @@
                         </template>
                         <v-list>
                             <v-list-item
-                                v-for="(item, index) in ['条形图', '饼图', '排名趋势']"
+                                v-for="(item, index) in dspTypeList"
                                 :key="index"
-                                @click="type = item"
+                                @click="open(item.value)"
                             >
-                            <v-list-item-title>{{ item }}</v-list-item-title>
+                            <v-list-item-title>{{ item.name }}</v-list-item-title>
                             </v-list-item>
                         </v-list>
                     </v-menu>
@@ -63,7 +66,7 @@
                         </template>
                         <v-list>
                             <v-list-item
-                                v-for="(item, index) in list"
+                                v-for="(item, index) in dateList"
                                 :key="index"
                                 @click="date = item"
                             >
@@ -93,15 +96,18 @@
                     :hide-default-footer="true"
                 >
                     <template v-slot:item.no="{ item }">
-                        <span>{{ count() }}</span>
+                        <span>{{ counter() }}</span>
                     </template>
                 </v-data-table>
                 
                 <br>
                 <p>
+                    <span v-show="footerMsg">
+                        {{ footerMsg }}
+                        <br>
+                    </span>
                     Made by GitHub@PinkChampagne17
-                    <br>
-                    Powered by Vue.js & Vuetify on GitHub Pages
+                    <a href='https://github.com/mahomahoohkoku/mahomahoohkoku.github.io'>Source code</a>
                 </p>
             </v-card>
         </v-app>
@@ -111,7 +117,7 @@
 <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
 <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.19.2/axios.min.js"></script>
-<script src="./js/index-controller.js"></script>
+<script src="./controller/index-controller.js"></script>
 <script>
-    document.getElementsByClassName('v-application--wrap')[0].style.minHeight = "auto";
+    // document.getElementsByClassName('v-application--wrap')[0].style.minHeight = "auto";
 </script>
