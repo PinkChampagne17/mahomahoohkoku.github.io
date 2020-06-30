@@ -416,7 +416,7 @@ const CHARAS = [
         "skills": [
             {
                 "name": "罗刹涅槃・极光终天冥坏破",
-                "time": 99
+                "time": 1
             }
         ]
     },
